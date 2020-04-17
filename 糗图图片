@@ -1,0 +1,31 @@
+import requests
+import re
+import os
+if not os.path.exists('./糗图图片'):
+    os.mkdir('./糗图图片')
+headers={
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; …) Gecko/20100101 Firefox/75.0'
+}
+url='https://www.qiushibaike.com/imgrank/page/%d/'
+for page_num in range(1,5):
+    if not os.path.exists('./糗图图片'+str(page_num)):
+        os.mkdir('./糗图图片'+str(page_num))
+    new_url=url % page_num
+    page_response=requests.get(url=url,headers=headers).text
+#print(page_response)
+    key='<div class="thumb">.*?<img src="(.*?)" alt=.*?</div>'
+    image_src_list=re.findall(key, page_response, re.S)
+    for scr in image_src_list:
+        scr='https:'+scr
+        #content（二进制图片），text（字符串）
+        image_data=requests.get(url=scr,headers=headers).content
+        image_name=scr.split('/')[-1]
+
+        image_path='./糗图图片%d/' % page_num
+        image_path = image_path + image_name
+        #因写入图片，所以用'wb'，
+        with open(image_path,'wb') as fp:
+            fp.write(image_data)
+            print("下载完成")
+
+
